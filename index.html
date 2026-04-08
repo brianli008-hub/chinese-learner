@@ -216,154 +216,28 @@
         <div class="results" id="results"></div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
     <script>
-        // Embedded dictionary data - common Chinese words by pinyin
-        const dictionary = {
-            'ma': [
-                { simplified: '妈', traditional: '媽', pinyin: 'mā', definition: 'mother' },
-                { simplified: '麻', traditional: '麻', pinyin: 'má', definition: 'hemp; numb' },
-                { simplified: '马', traditional: '馬', pinyin: 'mǎ', definition: 'horse' },
-                { simplified: '骂', traditional: '罵', pinyin: 'mà', definition: 'to scold; to curse' },
-                { simplified: '码', traditional: '碼', pinyin: 'mǎ', definition: 'code; yard (measure)' },
-                { simplified: '吗', traditional: '嗎', pinyin: 'ma', definition: '(question particle)' },
-            ],
-            'shui': [
-                { simplified: '水', traditional: '水', pinyin: 'shuǐ', definition: 'water' },
-                { simplified: '睡', traditional: '睡', pinyin: 'shuì', definition: 'to sleep' },
-            ],
-            'xue': [
-                { simplified: '学', traditional: '學', pinyin: 'xué', definition: 'to study; to learn' },
-                { simplified: '雪', traditional: '雪', pinyin: 'xuě', definition: 'snow' },
-                { simplified: '血', traditional: '血', pinyin: 'xiě', definition: 'blood' },
-            ],
-            'hao': [
-                { simplified: '好', traditional: '好', pinyin: 'hǎo', definition: 'good; well' },
-                { simplified: '号', traditional: '號', pinyin: 'hào', definition: 'number; mark' },
-                { simplified: '豪', traditional: '豪', pinyin: 'háo', definition: 'bold; outstanding' },
-            ],
-            'zai': [
-                { simplified: '在', traditional: '在', pinyin: 'zài', definition: 'at; in; on' },
-                { simplified: '再', traditional: '再', pinyin: 'zài', definition: 'again; then' },
-                { simplified: '载', traditional: '載', pinyin: 'zǎi', definition: 'to carry; year' },
-            ],
-            'le': [
-                { simplified: '了', traditional: '了', pinyin: 'le', definition: '(completion particle)' },
-                { simplified: '乐', traditional: '樂', pinyin: 'lè', definition: 'happy; music' },
-                { simplified: '勒', traditional: '勒', pinyin: 'lè', definition: 'to restrain' },
-            ],
-            'de': [
-                { simplified: '的', traditional: '的', pinyin: 'de', definition: '(possessive particle)' },
-                { simplified: '得', traditional: '得', pinyin: 'de', definition: 'to get; can' },
-                { simplified: '德', traditional: '德', pinyin: 'dé', definition: 'virtue; morality' },
-            ],
-            'yi': [
-                { simplified: '一', traditional: '一', pinyin: 'yī', definition: 'one; first' },
-                { simplified: '医', traditional: '醫', pinyin: 'yī', definition: 'doctor; medicine' },
-                { simplified: '易', traditional: '易', pinyin: 'yì', definition: 'easy; to change' },
-                { simplified: '意', traditional: '意', pinyin: 'yì', definition: 'meaning; intention' },
-            ],
-            'shi': [
-                { simplified: '是', traditional: '是', pinyin: 'shì', definition: 'to be; yes' },
-                { simplified: '十', traditional: '十', pinyin: 'shí', definition: 'ten' },
-                { simplified: '时', traditional: '時', pinyin: 'shí', definition: 'time; hour' },
-                { simplified: '事', traditional: '事', pinyin: 'shì', definition: 'matter; thing' },
-                { simplified: '室', traditional: '室', pinyin: 'shì', definition: 'room' },
-                { simplified: '士', traditional: '士', pinyin: 'shì', definition: 'scholar; soldier' },
-            ],
-            'ren': [
-                { simplified: '人', traditional: '人', pinyin: 'rén', definition: 'person; people' },
-                { simplified: '仁', traditional: '仁', pinyin: 'rén', definition: 'benevolence; humanity' },
-                { simplified: '任', traditional: '任', pinyin: 'rèn', definition: 'to assign; any' },
-            ],
-            'da': [
-                { simplified: '大', traditional: '大', pinyin: 'dà', definition: 'big; large; great' },
-                { simplified: '打', traditional: '打', pinyin: 'dǎ', definition: 'to hit; to strike' },
-                { simplified: '达', traditional: '達', pinyin: 'dá', definition: 'to reach; to attain' },
-            ],
-            'guo': [
-                { simplified: '国', traditional: '國', pinyin: 'guó', definition: 'country; nation' },
-                { simplified: '过', traditional: '過', pinyin: 'guò', definition: 'to pass; to go' },
-                { simplified: '锅', traditional: '鍋', pinyin: 'guō', definition: 'pot; pan' },
-            ],
-            'jia': [
-                { simplified: '家', traditional: '家', pinyin: 'jiā', definition: 'home; family' },
-                { simplified: '加', traditional: '加', pinyin: 'jiā', definition: 'to add; to increase' },
-                { simplified: '假', traditional: '假', pinyin: 'jiǎ', definition: 'false; fake; holiday' },
-            ],
-            'you': [
-                { simplified: '有', traditional: '有', pinyin: 'yǒu', definition: 'to have; there is' },
-                { simplified: '又', traditional: '又', pinyin: 'yòu', definition: 'again; also' },
-                { simplified: '油', traditional: '油', pinyin: 'yóu', definition: 'oil' },
-            ],
-            'wo': [
-                { simplified: '我', traditional: '我', pinyin: 'wǒ', definition: 'I; me' },
-                { simplified: '我们', traditional: '我們', pinyin: 'wǒmen', definition: 'we; us' },
-                { simplified: '握', traditional: '握', pinyin: 'wò', definition: 'to grasp' },
-            ],
-            'ni': [
-                { simplified: '你', traditional: '你', pinyin: 'nǐ', definition: 'you' },
-                { simplified: '你们', traditional: '你們', pinyin: 'nǐmen', definition: 'you (plural)' },
-                { simplified: '尼', traditional: '尼', pinyin: 'ní', definition: '(phonetic)' },
-            ],
-            'ta': [
-                { simplified: '他', traditional: '他', pinyin: 'tā', definition: 'he; him' },
-                { simplified: '她', traditional: '她', pinyin: 'tā', definition: 'she; her' },
-                { simplified: '它', traditional: '它', pinyin: 'tā', definition: 'it' },
-            ],
-            'chi': [
-                { simplified: '吃', traditional: '吃', pinyin: 'chī', definition: 'to eat' },
-                { simplified: '尺', traditional: '尺', pinyin: 'chǐ', definition: 'ruler; foot (measure)' },
-                { simplified: '迟', traditional: '遲', pinyin: 'chí', definition: 'late; slow' },
-            ],
-            'le': [
-                { simplified: '了', traditional: '了', pinyin: 'le', definition: '(particle indicating completion)' },
-                { simplified: '乐', traditional: '樂', pinyin: 'lè', definition: 'happy; music' },
-            ],
-            'bu': [
-                { simplified: '不', traditional: '不', pinyin: 'bù', definition: 'not; no' },
-                { simplified: '布', traditional: '布', pinyin: 'bù', definition: 'cloth; fabric' },
-                { simplified: '步', traditional: '步', pinyin: 'bù', definition: 'step; pace' },
-            ],
-            'he': [
-                { simplified: '和', traditional: '和', pinyin: 'hé', definition: 'and; harmony; peace' },
-                { simplified: '合', traditional: '合', pinyin: 'hé', definition: 'to combine; suitable' },
-                { simplified: '喝', traditional: '喝', pinyin: 'hē', definition: 'to drink' },
-            ],
-            'qing': [
-                { simplified: '请', traditional: '請', pinyin: 'qǐng', definition: 'please; to request' },
-                { simplified: '情', traditional: '情', pinyin: 'qíng', definition: 'feeling; emotion' },
-                { simplified: '清', traditional: '清', pinyin: 'qīng', definition: 'clear; pure' },
-            ],
-            'xie': [
-                { simplified: '谢', traditional: '謝', pinyin: 'xiè', definition: 'to thank' },
-                { simplified: '写', traditional: '寫', pinyin: 'xiě', definition: 'to write' },
-                { simplified: '鞋', traditional: '鞋', pinyin: 'xié', definition: 'shoe' },
-            ],
-            'kan': [
-                { simplified: '看', traditional: '看', pinyin: 'kàn', definition: 'to look; to watch' },
-                { simplified: '刊', traditional: '刊', pinyin: 'kān', definition: 'periodical; to publish' },
-                { simplified: '砍', traditional: '砍', pinyin: 'kǎn', definition: 'to chop; to cut' },
-            ],
-            'ting': [
-                { simplified: '听', traditional: '聽', pinyin: 'tīng', definition: 'to listen; to hear' },
-                { simplified: '停', traditional: '停', pinyin: 'tíng', definition: 'to stop; to park' },
-                { simplified: '廷', traditional: '廷', pinyin: 'tíng', definition: 'court' },
-            ],
-            'shuo': [
-                { simplified: '说', traditional: '說', pinyin: 'shuō', definition: 'to say; to speak' },
-                { simplified: '朔', traditional: '朔', pinyin: 'shuò', definition: 'first day of month' },
-            ],
-            'zuo': [
-                { simplified: '做', traditional: '做', pinyin: 'zuò', definition: 'to do; to make' },
-                { simplified: '坐', traditional: '坐', pinyin: 'zuò', definition: 'to sit' },
-                { simplified: '左', traditional: '左', pinyin: 'zuǒ', definition: 'left' },
-            ],
-            'lai': [
-                { simplified: '来', traditional: '來', pinyin: 'lái', definition: 'to come' },
-                { simplified: '莱', traditional: '萊', pinyin: 'lái', definition: 'wormwood' },
-                { simplified: '赖', traditional: '賴', pinyin: 'lài', definition: 'to rely on' },
-            ],
-        };
+        let dictionaryCache = null;
+
+        async function loadDictionary() {
+            if (dictionaryCache) return dictionaryCache;
+            
+            try {
+                const response = await fetch('./cedict.json.gz');
+                if (!response.ok) throw new Error('Failed to load dictionary');
+                
+                const arrayBuffer = await response.arrayBuffer();
+                const decompressed = pako.ungzip(arrayBuffer, { to: 'string' });
+                dictionaryCache = JSON.parse(decompressed);
+                
+                return dictionaryCache;
+            } catch (error) {
+                console.error('Dictionary load error:', error);
+                showError('Could not load dictionary. Make sure cedict.json.gz is in the same folder as index.html');
+                return null;
+            }
+        }
 
         function stripTones(pinyin) {
             // Remove tone marks from pinyin
@@ -380,7 +254,7 @@
             return pinyin.toLowerCase().replace(/./g, char => toneMarks[char] || char);
         }
 
-        function search() {
+        async function search() {
             const input = document.getElementById('pinyinInput').value.trim().toLowerCase();
             if (!input) {
                 document.getElementById('results').innerHTML = '';
@@ -389,29 +263,39 @@
             }
 
             const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<div class="loading"><div class="spinner"></div>Searching 124,000+ words...</div>';
+            resultsDiv.classList.add('show');
+
+            const dictionary = await loadDictionary();
+            if (!dictionary) return;
+
+            // Strip tones from input
             const stripped = stripTones(input);
 
-            // Search in dictionary
+            // Find matching entries
             let results = [];
             
-            // First try exact match
+            // Try exact match first
             if (dictionary[stripped]) {
                 results = dictionary[stripped];
             } else {
-                // Try partial matches
+                // Try prefix matches
                 for (const [key, words] of Object.entries(dictionary)) {
-                    if (key.includes(stripped) || stripped.includes(key)) {
+                    if (key.startsWith(stripped)) {
                         results = results.concat(words);
                     }
                 }
             }
+
+            // Limit results to 100 for performance
+            results = results.slice(0, 100);
 
             if (results.length === 0) {
                 resultsDiv.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">🔍</div>
                         <p>No words found for "<strong>${escapeHtml(input)}</strong>"</p>
-                        <p style="font-size: 12px; margin-top: 10px;">Try searching for: ma, shui, xue, hao, zai, de, shi, ren, da, jia, chi, or other common pinyin</p>
+                        <p style="font-size: 12px; margin-top: 10px;">Try: ma, shui, xue, hao, chi, jia, shi, ren, or any other pinyin</p>
                     </div>
                 `;
             } else {
@@ -426,11 +310,11 @@
                     html += `
                         <div class="word-card">
                             <div class="word-header">
-                                <div class="chinese-char">${escapeHtml(entry.simplified)}</div>
-                                <div class="pinyin">${escapeHtml(entry.pinyin)}</div>
+                                <div class="chinese-char">${escapeHtml(entry.s)}</div>
+                                <div class="pinyin">${escapeHtml(entry.p)}</div>
                             </div>
-                            ${entry.traditional && entry.traditional !== entry.simplified ? `<div class="traditional">Traditional: ${escapeHtml(entry.traditional)}</div>` : ''}
-                            <div class="definition">${escapeHtml(entry.definition)}</div>
+                            ${entry.t && entry.t !== entry.s ? `<div class="traditional">Traditional: ${escapeHtml(entry.t)}</div>` : ''}
+                            <div class="definition">${escapeHtml(entry.d)}</div>
                         </div>
                     `;
                 });
@@ -438,8 +322,14 @@
                 html += '</div>';
                 resultsDiv.innerHTML = html;
             }
+        }
 
-            resultsDiv.classList.add('show');
+        function showError(message) {
+            document.getElementById('results').innerHTML = `
+                <div class="error-message">
+                    <strong>Error:</strong> ${message}
+                </div>
+            `;
         }
 
         function escapeHtml(text) {
